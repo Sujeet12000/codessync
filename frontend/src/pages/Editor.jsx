@@ -4,7 +4,7 @@
 // frontend/src/pages/Editor.jsx
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useLocation, useNavigate }      from 'react-router-dom';
-import EditorLayout from '../components/EditorLayout';
+import EditorLayout from '../Components/EditorLayout';
 import useSocket    from '../hooks/useSocket';
 import '../styles/Editor.css';
 
