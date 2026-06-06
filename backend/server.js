@@ -6,10 +6,13 @@ import cors          from 'cors';
 
 const app    = express();
 const server = http.createServer(app);
-
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://codessync.vercel.app'
+];
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173',   // Vite dev server
+    origin: allowedOrigins,   // Vite dev server
     methods: ['GET', 'POST'],
   },
   // Tune for low-latency text edits
@@ -17,7 +20,7 @@ const io = new Server(server, {
   pingTimeout:  5_000,
 });
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
 app.get('/', (_req, res) => res.send('CodeSync backend running.'));
