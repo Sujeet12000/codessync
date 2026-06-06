@@ -1,0 +1,306 @@
+/* frontend/src/styles/Editor.css */
+/* frontend/src/styles/Editor.css */
+/* ── Status variants ── */
+/* =============================================================================
+   CodeSync — Editor.css
+   Monaco visibility fix + full dark UI
+   ============================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;700;800&display=swap');
+
+/* ── Reset ────────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Design tokens ────────────────────────────────────────────────────────── */
+:root {
+  --bg:          #0b0d11;
+  --surface:     #13161d;
+  --surface2:    #0f1117;
+  --border:      #1f2430;
+  --accent:      #4fffb0;
+  --accent2:     #00c8ff;
+  --text:        #e8eaf0;
+  --muted:       #5a6072;
+  --toolbar-h:   42px;
+  --sidebar-w:   240px;
+  --font-ui:     'Syne', sans-serif;
+  --font-mono:   'JetBrains Mono', monospace;
+}
+
+/* ── CRITICAL: height chain must be unbroken from html → Monaco ───────────── */
+/*
+   Every ancestor of Monaco must have an explicit or inherited height.
+   The chain: html → body → #root → .editor-root → .editor-main
+                                                   → .editor-canvas → Monaco
+   Any broken link = Monaco gets 0px and renders blank.
+*/
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;                /* passes height down to #root */
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  overflow: hidden;            /* prevent body scroll; Monaco scrolls internally */
+}
+
+#root {
+  height: 100%;                /* passes height down to .editor-root */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Root layout: sidebar | main ──────────────────────────────────────────── */
+.editor-root {
+  display: flex;
+  flex-direction: row;
+  height: 100%;                /* fills #root — DO NOT use 100vh here,        */
+                               /* 100vh ignores parent flex and can cause      */
+                               /* double-scroll on mobile                      */
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────────────────── */
+.editor-sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w); /* never shrink below this */
+  max-width: var(--sidebar-w); /* never grow beyond this  */
+  height: 100%;                /* explicit — fills editor-root */
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1.25rem;
+  gap: 2rem;
+  overflow-y: auto;            /* sidebar itself can scroll if content overflows */
+  overflow-x: hidden;
+}
+
+/* ── Main column: toolbar + editor-canvas ─────────────────────────────────── */
+.editor-main {
+  flex: 1 1 0;                 /* grow, shrink, basis 0 — fills remaining width */
+  min-width: 0;                /* CRITICAL: allow flex child to shrink past content size */
+  height: 100%;                /* explicit height — do not omit */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface2);
+}
+
+/* ── Toolbar ──────────────────────────────────────────────────────────────── */
+.editor-toolbar {
+  flex: 0 0 var(--toolbar-h);  /* fixed height, never grow or shrink */
+  height: var(--toolbar-h);
+  min-height: var(--toolbar-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+/* ── Editor canvas ────────────────────────────────────────────────────────── */
+/*
+   This is the direct parent of the Monaco wrapper div.
+   It MUST have:
+     - flex: 1 1 0       → take all remaining height after toolbar
+     - min-height: 0     → CRITICAL: without this, flex refuses to shrink
+                           and the child Monaco div gets auto/0 height
+     - overflow: hidden  → Monaco manages its own internal scroll
+     - display: flex     → so Monaco's inner wrapper also fills correctly
+     - flex-direction: column
+*/
+.editor-canvas {
+  flex: 1 1 0;
+  min-height: 0;               /* THE fix — removes min-height:auto default */
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;          /* anchor for Monaco's absolutely-positioned overlays */
+}
+
+/*
+   Monaco mounts as:
+     .editor-canvas
+       div (Monaco root, gets height:100% via automaticLayout)
+         div.overflow-guard
+           ...
+   The Monaco root div must also fill its parent.
+   @monaco-editor/react sets style="height: 100%" on it automatically
+   when you pass height="100%" — but only if the parent is sized.
+   With the rules above, .editor-canvas IS sized, so Monaco fills it.
+*/
+
+/* ── Sidebar content ──────────────────────────────────────────────────────── */
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.sidebar-icon {
+  font-size: 1.4rem;
+}
+
+.sidebar-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sidebar-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  flex: 1;                     /* pushes footer to bottom */
+  overflow-y: auto;
+}
+
+.meta-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.meta-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.meta-value {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text);
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+.meta-room {
+  cursor: pointer;
+  color: var(--accent);
+  transition: opacity 0.2s;
+}
+.meta-room:hover { opacity: 0.65; }
+
+.meta-hint {
+  font-size: 0.65rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+.meta-user { color: var(--accent2); }
+
+/* ── Clients list ─────────────────────────────────────────────────────────── */
+.clients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+}
+
+.client-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--text);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.client-self {
+  border-color: #4fffb030;
+  background: #4fffb008;
+}
+
+.client-dot {
+  font-size: 0.5rem;
+  color: var(--accent);
+}
+
+.client-you {
+  margin-left: auto;
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+
+/* ── Sidebar footer ───────────────────────────────────────────────────────── */
+.sidebar-footer {
+  flex-shrink: 0;              /* never compress the footer */
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.sidebar-status {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.status-connected    { color: var(--accent); }
+.status-connecting   { color: #ffd080; }
+.status-disconnected { color: #ff6b7a; }
+
+/* ── Toolbar content ──────────────────────────────────────────────────────── */
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toolbar-file {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent);
+  background: #4fffb012;
+  border: 1px solid #4fffb025;
+  border-radius: 5px;
+  padding: 0.2rem 0.6rem;
+}
+
+.toolbar-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.toolbar-select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.toolbar-select:focus   { border-color: var(--accent); }
+.toolbar-select:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
