@@ -23,12 +23,30 @@ Node.js
 Express.js
 Socket.IO
 CORS
-Screenshots
-Home Screen
 
-Collaborative Editing - User 1
+## Screenshots
 
-Collaborative Editing - User 2
+### 🏠 Home Screen
+
+Users can create a new collaborative room or join an existing room using a Room ID.
+
+![Home Screen](./Home-Screen.png)
+
+---
+
+### 👨‍💻 Collaborative Editing – User 1
+
+Real-time code editor with participant list, room information, and live synchronization.
+
+![Collaborative Editing User 1](./Collaborative%20Editing%20-%20user1.png)
+
+---
+
+### 👨‍💻 Collaborative Editing – User 2
+
+Changes made by one user are instantly reflected to all participants in the room.
+
+![Collaborative Editing User 2](./Collaborative%20Editing%20-%20user2.png)
 
 How It Works
 Create a room or join an existing room.
