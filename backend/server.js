@@ -39,7 +39,7 @@ function getRoom(roomId) {
   }
   return rooms.get(roomId);
 }
-
+console.log("SOCKET VERSION 777");
 // ── Socket.io ────────────────────────────────────────────────────────────────
 io.on('connection', (socket) => {
   console.log(`[connect]    ${socket.id}`);
