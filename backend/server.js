@@ -9,6 +9,7 @@ const server = http.createServer(app);
 const allowedOrigins = [
   'http://localhost:5173',
   'https://codessync.vercel.app'
+  'https://codessync-o75sydb2a-sujeetc1029-2517s-projects.vercel.app'
 ];
 const io = new Server(server, {
   cors: {
