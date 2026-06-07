@@ -13,7 +13,7 @@ const allowedOrigins = [
 ];
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,   // Vite dev server
+    origin: "*",   // Vite dev server
     methods: ['GET', 'POST'],
   },
   // Tune for low-latency text edits
